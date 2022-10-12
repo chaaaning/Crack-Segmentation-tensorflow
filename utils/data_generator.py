@@ -28,7 +28,7 @@ class DataIterator(Iterator):
                  batch_size,
                  target_size,
                  shuffle=True,
-                 seed=None,
+                 seed=80,
                  data_aug_rate=0.):
         num_images = len(images_list)
 
@@ -46,7 +46,7 @@ class DataIterator(Iterator):
         with open(anno_path, 'r', encoding='utf-8') as f:
             contents = f.read()
             json_data = json.loads(contents)
-        #
+
         # str_fname = str(anno_path)
         # img_pth = Path(
         #     img_path
@@ -89,7 +89,7 @@ class DataIterator(Iterator):
             image = load_image(self.images_list[idx])
 
             # masking load
-            anno_path = 'D:/crack data/도로장애물·표면 인지 영상(수도권)/Training/Annotations/data'
+            # anno_path = 'D:/crack data/도로장애물·표면 인지 영상(수도권)/Training/Annotations/data'
 
             label = self.load_mask(self.images_list[idx])
 
@@ -121,7 +121,6 @@ class DataIterator(Iterator):
                     image, label = random_zoom(image, label, self.image_data_generator.zoom_range)
 
             # standardization
-            # image = tf.image.per_image_standardization(image)
             image = imagenet_utils.preprocess_input(image.astype('float32'), data_format='channels_last',
                                                     mode='torch')
             label = tf.one_hot(label,self.num_classes,axis=-1) # 기존의 one-hot encoding이 잘못된것은 아닐까....

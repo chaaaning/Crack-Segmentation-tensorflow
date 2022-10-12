@@ -107,7 +107,7 @@ if args.lr_warmup and args.num_epochs - 5 <= 0:
 
 lr_decays = {'poly_decay':PolynomialDecay(initial_learning_rate=args.learning_rate,decay_steps=len(train_image_names),end_learning_rate=1e-10,name='poly_lr'),
              'cosine_decay':CosineDecay(initial_learning_rate=args.learning_rate, decay_steps=len(train_image_names),name='cosine_lr'),
-             'expo_decay':ExponentialDecay(initial_learning_rate=args.learning_rate, decay_steps=len(train_image_names),name='expo_lr')}
+             'expo_decay':ExponentialDecay(initial_learning_rate=args.learning_rate, decay_steps=len(train_image_names),decay_rate=0.96,name='expo_lr')}
 
 lr_decay = lr_decays[args.lr_scheduler]
 
@@ -135,7 +135,6 @@ image_gen = ImageDataGenerator(random_crop=args.random_crop,
                                horizontal_flip=args.v_flip,
                                vertical_flip=args.v_flip)
 
-
 train_generator = image_gen.flow(images_list=train_image_names,
                                  num_classes=args.num_classes,
                                  batch_size=args.batch_size,
@@ -147,7 +146,8 @@ train_generator = image_gen.flow(images_list=train_image_names,
 valid_generator = image_gen.flow(images_list=valid_image_names,
                                  num_classes=args.num_classes,
                                  batch_size=args.valid_batch_size,
-                                 target_size=(args.crop_height, args.crop_width))
+                                 target_size=(args.crop_height, args.crop_width)
+                                 )
 
 # begin training
 print("\n***** Begin training *****")
