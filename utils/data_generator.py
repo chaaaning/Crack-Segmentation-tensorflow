@@ -28,7 +28,7 @@ class DataIterator(Iterator):
                  batch_size,
                  target_size,
                  shuffle=True,
-                 seed=80,
+                 seed=None,
                  data_aug_rate=0.):
         num_images = len(images_list)
 
@@ -89,7 +89,7 @@ class DataIterator(Iterator):
             image = load_image(self.images_list[idx])
 
             # masking load
-            # anno_path = 'D:/crack data/도로장애물·표면 인지 영상(수도권)/Training/Annotations/data'
+            anno_path = 'D:/crack data/도로장애물·표면 인지 영상(수도권)/Training/Annotations/data'
 
             label = self.load_mask(self.images_list[idx])
 

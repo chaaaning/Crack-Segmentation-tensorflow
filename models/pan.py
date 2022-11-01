@@ -84,13 +84,13 @@ class PAN(Network):
         down3 = self._conv_bn_relu(down3, 1, 3, 1)
 
         # up
-        up2 = layers.UpSampling2D(size=(2, 2))(down3)
+        up2 = layers.UpSampling2D(size=(2, 2), interpolation='bilinear')(down3)
         up2 = layers.Add()([up2, down2])
 
-        up1 = layers.UpSampling2D(size=(2, 2))(up2)
+        up1 = layers.UpSampling2D(size=(2, 2), interpolation='bilinear')(up2)
         up1 = layers.Add()([up1, down1])
 
-        up = layers.UpSampling2D(size=(2, 2))(up1)
+        up = layers.UpSampling2D(size=(2, 2), interpolation='bilinear')(up1)
 
         x = layers.Conv2D(out_filters, 1, strides=1, kernel_initializer='he_normal')(x)
         x = layers.BatchNormalization()(x)

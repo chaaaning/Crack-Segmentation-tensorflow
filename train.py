@@ -19,6 +19,7 @@ from tqdm import tqdm
 import logging
 
 from tensorflow.keras.optimizers.schedules import CosineDecay,PolynomialDecay,ExponentialDecay
+import tensorflow_model_optimization as tfmot
 import tensorflow as tf
 import argparse
 import os
@@ -64,7 +65,7 @@ parser.add_argument('--random_seed', help='The random shuffle seed.',type=int, d
 parser.add_argument('--weights', help='The path of weights to be loaded.', type=str, default=None)
 parser.add_argument('--steps_per_epoch', help='The training steps of each epoch', type=int, default=None)
 parser.add_argument('--lr_scheduler', help='The strategy to schedule learning rate.', type=str, default='cosine_decay',
-                    choices=['step_decay', 'poly_decay', 'cosine_decay'])
+                    choices=['expo_decay', 'poly_decay', 'cosine_decay'])
 parser.add_argument('--lr_warmup', help='Whether to use lr warm up.', type=bool, default=False)
 parser.add_argument('--learning_rate', help='The initial learning rate.', type=float, default=3e-4)
 parser.add_argument('--optimizer', help='The optimizer for training.', type=str, default='adam',
@@ -78,11 +79,19 @@ paths = check_related_path(os.getcwd())
 # get image and label file names for training and validation
 train_image_names, valid_image_names = get_dataset_info(args.dataset)
 
+# quantization model
+quantize_model = tfmot.quantization.keras.quantize_model
+
 # build the model
 net, base_model = builder(args.num_classes, (args.crop_height, args.crop_width), args.model, args.base_model)
 
+is_quantize = True
+
+if is_quantize:
+    net = quantize_model(net)
+
 # summary
-net.summary()
+# net.summary()
 
 # load weights
 if args.weights is not None:
@@ -91,9 +100,9 @@ if args.weights is not None:
 
 # chose loss
 losses = {'ce': categorical_crossentropy_with_logits,
-          'focal_loss': focal_loss(alpha=0.35,gamma=5),
+          'focal_loss': focal_loss(alpha=0.25,gamma=4.0),
           'miou_loss': miou_loss(num_classes=args.num_classes),
-          'self_balanced_focal_loss': self_balanced_focal_loss(),
+          'self_balanced_focal_loss': self_balanced_focal_loss(alpha=1,gamma=2.0),
           'dice_loss': dice_coef_loss()}
 
 loss = losses[args.loss] if args.loss is not None else categorical_crossentropy_with_logits
@@ -182,6 +191,7 @@ epochs = args.num_epochs
 global_steps = 0
 optimizer = optimizers[args.optimizer]
 net.compiled_metrics = None
+ce_loss = categorical_crossentropy_with_logits
 
 for epoch in range(epochs):
     epoch_loss = 0

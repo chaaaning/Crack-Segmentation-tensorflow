@@ -24,6 +24,7 @@ def categorical_crossentropy_with_logits(y_true, y_pred):
 def focal_loss(alpha=0.25, gamma=4.0):
     def loss(y_true, y_pred):
         y_pred = backend.softmax(y_pred,axis=-1)
+
         # compute ce loss
         cross_entropy = backend.categorical_crossentropy(y_true, y_pred, from_logits=False)
 

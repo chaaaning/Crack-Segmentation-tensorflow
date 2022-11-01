@@ -7,6 +7,7 @@ The model builder to build different semantic segmentation models.
 
 """
 from models import *
+from models.pidnet import get_pred_model, PIDNet
 import tensorflow as tf
 
 layers = tf.keras.layers
@@ -25,12 +26,19 @@ def builder(num_classes, input_size=(256, 256), model='SegNet', base_model=None)
               'DenseASPP': DenseASPP,
               'DeepLabV3': DeepLabV3,
               'DeepLabV3Plus': DeepLabV3Plus,
-              'BiSegNet': BiSegNet}
+              'BiSegNet': BiSegNet,
+              'PIDNet':PIDNet}
 
     assert model in models
 
-    net = models[model](num_classes, model, base_model)
+    if 'PIDNet' == model:
+        model_name = "pidnet_m"
+        net = get_pred_model(model_name,input_size+(3,),num_classes)
 
-    inputs = layers.Input(shape=input_size+(3,))
+        return net, "resnet"
 
-    return net(inputs), net.get_base_model()
+    else:
+        net = models[model](num_classes, model, base_model)
+        inputs = layers.Input(shape=input_size+(3,))
+
+        return net(inputs), net.get_base_model()
