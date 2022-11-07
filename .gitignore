@@ -1,3 +1,4 @@
 wandb/
 checkpoints/
 __pycache__
+inference/
