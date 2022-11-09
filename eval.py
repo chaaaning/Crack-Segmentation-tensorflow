@@ -10,7 +10,6 @@ from utils.losses import dice_coef
 def evaluate(net, dataloader):
     num_val_batches = len(dataloader)
     n_classes = 2
-    metrics = F1Score(classes=n_classes)
 
     score = 0
     batches = 0

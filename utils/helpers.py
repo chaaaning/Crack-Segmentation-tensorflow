@@ -14,7 +14,7 @@ import pandas as pd
 
 # split train and validation
 def permutation_train_test_split(data_path,val_size=0.1, shuffle=True,random_state=1004):
-    data_list = np.genfromtxt('./data_list/mask_ratio_over_five.csv',delimiter=',',skip_header=1,dtype=str)[:,1] # file name list를 불러옴
+    data_list = np.genfromtxt('./data_list/extract_50k.csv',delimiter=',',skip_header=1,dtype=str)[:,1] # file name list를 불러옴
     val_num = int(len(data_list)*val_size)
     train_num = len(data_list) - val_num
 

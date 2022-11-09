@@ -67,6 +67,8 @@ def random_brightness(image, label, brightness_range):
         label = np.expand_dims(label, axis=-1)
     assert np.ndim(label) == 3
 
+    # brightness_range = [float(num) for num in brightness_range.split(',')] # string 형태의 값을 float형태로 바꾸어주어 list로 저장한다.
+
     if brightness_range is not None:
         if isinstance(brightness_range, (tuple, list)) and len(brightness_range) == 2:
             brightness = np.random.uniform(brightness_range[0], brightness_range[1])
