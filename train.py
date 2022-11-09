@@ -155,7 +155,8 @@ train_generator = image_gen.flow(images_list=train_image_names,
 valid_generator = image_gen.flow(images_list=valid_image_names,
                                  num_classes=args.num_classes,
                                  batch_size=args.valid_batch_size,
-                                 target_size=(args.crop_height, args.crop_width)
+                                 target_size=(args.crop_height, args.crop_width),
+                                 data_aug_rate=args.data_aug_rate
                                  )
 
 # begin training
@@ -222,7 +223,7 @@ for epoch in range(epochs):
             # 특정 시점마다 validation을 진행하도록 해야 한다. 한 epoch에서 몇 번 진행할지 설정해야함.
 
             division_step = (len(train_image_names) // (2 * args.batch_size))
-            export_img_step = (len(train_image_names) // (10 * args.batch_size))
+            export_img_step = (len(train_image_names) // (4 * args.batch_size))
 
             if division_step > 0 or export_img_step > 0:
                 # 10%마다 이미지 저장
