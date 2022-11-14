@@ -1,11 +1,3 @@
-"""
-The implementation of Data Generator based on Tensorflow.
-
-@Author: Yang Lu
-@Github: https://github.com/luyanger1799
-@Project: https://github.com/luyanger1799/amazing-semantic-segmentation
-
-"""
 from tensorflow.python.keras.preprocessing.image import Iterator
 from keras_applications import imagenet_utils
 from utils.utils import *
@@ -42,7 +34,7 @@ class DataIterator(Iterator):
 
     @classmethod
     def load_mask(self,img_path,thick=5):
-        anno_path = img_path.replace("Images","Annotations").replace(".png","_PLINE.json")
+        anno_path = img_path.replace("train","train_anno").replace(".png","_PLINE.json")
         with open(anno_path, 'r', encoding='utf-8') as f:
             contents = f.read()
             json_data = json.loads(contents)
@@ -87,9 +79,6 @@ class DataIterator(Iterator):
         for i, idx in enumerate(index_array):
             # image load
             image = load_image(self.images_list[idx])
-
-            # masking load
-            anno_path = 'D:/crack data/도로장애물·표면 인지 영상(수도권)/Training/Annotations/data'
 
             label = self.load_mask(self.images_list[idx])
 

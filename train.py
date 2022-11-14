@@ -1,11 +1,3 @@
-"""
-The file defines the training process.
-
-@Author: Yang Lu
-@Github: https://github.com/luyanger1799
-@Project: https://github.com/luyanger1799/amazing-semantic-segmentation
-
-"""
 from utils.data_generator import ImageDataGenerator
 from utils.helpers import get_dataset_info, check_related_path
 from utils.callbacks import LearningRateScheduler
@@ -184,8 +176,8 @@ print("\tChannel Shift -->", args.channel_shift)
 print("")
 
 # init wandb
-experiment = wandb.init(project='crack-detection', resume='allow', anonymous='must')
-experiment.config.update(dict(epochs=args.num_epochs, batch_size=args.batch_size, learning_rate=args.learning_rate))
+# experiment = wandb.init(project='crack-detection', resume='allow', anonymous='must')
+# experiment.config.update(dict(epochs=args.num_epochs, batch_size=args.batch_size, learning_rate=args.learning_rate))
 
 epochs = args.num_epochs
 # f1_score = F1Score(classes=2)
@@ -212,11 +204,11 @@ for epoch in range(epochs):
 
             pbar.update(images.shape[0])
             global_steps += 1
-            experiment.log({
-                'train loss':loss_val,
-                'step':global_steps,
-                'epoch':epoch
-            })
+            # experiment.log({
+            #     'train loss':loss_val,
+            #     'step':global_steps,
+            #     'epoch':epoch
+            # })
             pbar.set_postfix(**{'loss(batch)':loss_val.numpy()})
 
             # Evaluation
@@ -227,25 +219,25 @@ for epoch in range(epochs):
 
             if division_step > 0 or export_img_step > 0:
                 # 10%마다 이미지 저장
-                if global_steps % export_img_step == 0:
-                    experiment.log({
-                        'images':wandb.Image(images[0]),
-                        'masks':{
-                            'true':wandb.Image(masks[0,:,:,1]),
-                            'pred':wandb.Image(tf.argmax(tf.nn.softmax(preds[0],axis=-1),axis=-1))
-                        }
-                    })
+                # if global_steps % export_img_step == 0:
+                #     experiment.log({
+                #         'images':wandb.Image(images[0]),
+                #         'masks':{
+                #             'true':wandb.Image(masks[0,:,:,1]),
+                #             'pred':wandb.Image(tf.argmax(tf.nn.softmax(preds[0],axis=-1),axis=-1))
+                #         }
+                #     })
 
                 if global_steps % division_step == 0:
                     val_score = evaluate(net,valid_generator)
 
-                    logging.info('Validation F1-Score: {}'.format(val_score))
-                    experiment.log({
-                        'learning_rate':optimizer._decayed_lr('float32').numpy(),
-                        'validation Dice-Score':val_score,
-                        'step': global_steps,
-                        'epoch':epoch
-                    })
+                    # logging.info('Validation F1-Score: {}'.format(val_score))
+                    # experiment.log({
+                    #     'learning_rate':optimizer._decayed_lr('float32').numpy(),
+                    #     'validation Dice-Score':val_score,
+                    #     'step': global_steps,
+                    #     'epoch':epoch
+                    # })
 
             # 명시적으로 loop를 나가게 해줘야함. generator loop가 무한으로 돌기때문에
             batches += 1

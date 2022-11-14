@@ -14,7 +14,7 @@ import pandas as pd
 
 # split train and validation
 def permutation_train_test_split(data_path,val_size=0.1, shuffle=True,random_state=1004):
-    data_list = np.genfromtxt('./data_list/extract_50k.csv',delimiter=',',skip_header=1,dtype=str)[:,1] # file name list를 불러옴
+    data_list = np.genfromtxt('./data_list/mask_ratio_over_five.csv',delimiter=',',skip_header=1,dtype=str)[:,1] # file name list를 불러옴
     val_num = int(len(data_list)*val_size)
     train_num = len(data_list) - val_num
 
@@ -39,27 +39,6 @@ def permutation_train_test_split(data_path,val_size=0.1, shuffle=True,random_sta
 # 2. random하게 나눈다(단 seed는 동일하게)
 # 3. 이미지 리스트 반환
 def get_dataset_info(dataset_path):
-    # 굳이 checking을....?
-    # image_label_paths = check_dataset_path(dataset_path)
-    # image_label_paths = dataset_path
-    # image_label_names = list() # train, valid
-
-    # dataset_path를 통하여 데이터셋 리스트가 들어올 것이다.
-    # 그럼 이를 train and valid set으로 나눌 수 있도록 한다.
-
-    # 1. train test split
-
-    # for i, path in enumerate(image_label_paths):
-    #     names = list()
-    #     if path is not None:
-    #         files = sorted(os.listdir(path))
-    #         for file in files:
-    #             names.append(os.path.join(path, file))
-    #     image_label_names.append(names)
-
-    # assert len(image_label_names[0]) == len(image_label_names[1])
-    # assert len(image_label_names[2]) == len(image_label_names[3])
-
     return permutation_train_test_split(dataset_path)
 
 
