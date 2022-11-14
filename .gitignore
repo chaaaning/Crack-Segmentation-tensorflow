@@ -2,4 +2,5 @@ wandb/
 checkpoints/
 __pycache__
 inference/
-.idea/
+image_predictions/*.jpg
+image_predictions/*.csv
