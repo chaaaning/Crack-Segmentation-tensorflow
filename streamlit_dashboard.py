@@ -110,7 +110,7 @@ with chart2:
 
 
 # -- Draw Maps
-st.header("Draw Heatmap")
+
 map_view_data = data[show_cols].copy()
 map_view_data.dropna(axis=0, subset=['latitude', 'longitude'], inplace=True)
 map_view_data['latitude'] = pd.to_numeric(map_view_data['latitude'])
@@ -119,6 +119,7 @@ mean_crack_ratio = map_view_data.groupby(by=["latitude", "longitude"], as_index=
 mean_crack_ratio["stand_mr"] = mean_crack_ratio["masking_rate"]/mean_crack_ratio["masking_rate"].max()
 # st.map(mean_crack_ratio)
 center = [127.380, 36.360]
+st.header("Draw Heatmap")
 st.pydeck_chart(pdk.Deck(
     map_style=None,
     initial_view_state=pdk.ViewState(
@@ -126,22 +127,25 @@ st.pydeck_chart(pdk.Deck(
         latitude=center[1],
         zoom=11,
         pitch=50,
-        bearing=15,
+        bearing=-15,
     ),
+    tooltip={"html":"<b>Longitude: </b> {longitude} <br /> "
+                    "<b>Latitude: </b>{latitude} <br /> "
+                    "<b>Masking Rate: </b>{masking_rate}"},
     layers=[
-        # pdk.Layer(
-        #     'ScatterplotLayer',
-        #     map_view_data,
-        #     get_position='[longitude, latitude]',
-        #     get_radius=20,
-        #     get_fill_color='[255, 255-255*masking_rate, 255-255*masking_rate, 255*masking_rate]',
-        #     pickable=True,
-        #     auto_highlight=True,    # 마우스 오버시 출력
-        #     # get_radius="500*stand_mr"
-        #     # get_elevation='stand_mr',
-        #     # elevation_scale=4,
-        #     # elevation_rate = [0, 1000]
-        # ),
+        pdk.Layer(
+            'ScatterplotLayer',
+            map_view_data,
+            get_position='[longitude, latitude]',
+            get_radius=20,
+            get_fill_color='[255, 255-255*masking_rate, 255-255*masking_rate, 255*masking_rate]',
+            pickable=True,
+            auto_highlight=True,    # 마우스 오버시 출력
+            # get_radius="500*stand_mr"
+            # get_elevation='stand_mr',
+            # elevation_scale=4,
+            # elevation_rate = [0, 1000]
+        ),
         pdk.Layer(
             'HeatmapLayer',
             mean_crack_ratio,
@@ -152,3 +156,26 @@ st.pydeck_chart(pdk.Deck(
         )
     ],
 ))
+st.header("Grid Chart")
+st.pydeck_chart(pdk.Deck(
+    map_style=None,
+    initial_view_state=pdk.ViewState(
+        longitude=center[0],
+        latitude=center[1],
+        zoom=11,
+        pitch=50,
+        bearing=-15,
+    ),
+    layers=[
+        pdk.Layer(
+            'GPUGridLayer',
+            map_view_data,
+            get_position='[longitude, latitude]',
+            pickable=True,
+            # auto_highlight=True,
+            extruded=True,
+            elevation_scale=3
+        )
+    ]
+))
+
