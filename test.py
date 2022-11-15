@@ -1,11 +1,3 @@
-"""
-The file defines the testing process.
-
-@Author: Yang Lu
-@Github: https://github.com/luyanger1799
-@Project: https://github.com/luyanger1799/amazing-semantic-segmentation
-
-"""
 from utils.data_generator import ImageDataGenerator
 from utils.helpers import get_dataset_info, check_related_path
 from utils.losses import categorical_crossentropy_with_logits
@@ -14,6 +6,8 @@ from builders import builder
 import tensorflow as tf
 import argparse
 import os
+from eval import evaluate
+import tensorflow_model_optimization as tfmot
 
 
 def str2bool(v):
@@ -23,7 +17,6 @@ def str2bool(v):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', help='Choose the semantic segmentation methods.', type=str, required=True)
@@ -40,37 +33,32 @@ args = parser.parse_args()
 # check related paths
 paths = check_related_path(os.getcwd())
 
-# get image and label file names for training and validation
-_, _, _, _, test_image_names, test_label_names = get_dataset_info(args.dataset)
+# image list loads
+test_image_names = os.listdir('../data/test')
+test_image_names = [os.path.join(args.dataset,name) for name in test_image_names]
+
+# quantization model
+quantize_model = tfmot.quantization.keras.quantize_model
 
 # build the model
 net, base_model = builder(args.num_classes, (args.crop_height, args.crop_width), args.model, args.base_model)
+net = quantize_model(net)
 
 # summary
 net.summary()
 
 # load weights
 print('Loading the weights...')
-if args.weights is None:
-    net.load_weights(filepath=os.path.join(
-        paths['weigths_path'], '{model}_based_on_{base_model}.h5'.format(model=args.model, base_model=base_model)))
-else:
-    if not os.path.exists(args.weights):
-        raise ValueError('The weights file does not exist in \'{path}\''.format(path=args.weights))
-    net.load_weights(args.weights)
+net.load_weights(filepath='./weights/UNet_based_on_MobileNetV2_CE_QAT_288384_50000.h5')
 
-# compile the model
-net.compile(optimizer=tf.keras.optimizers.Adam(),
-            loss=categorical_crossentropy_with_logits,
-            metrics=[MeanIoU(args.num_classes)])
 # data generator
 test_gen = ImageDataGenerator()
 
 test_generator = test_gen.flow(images_list=test_image_names,
-                               labels_list=test_label_names,
                                num_classes=args.num_classes,
                                batch_size=args.batch_size,
-                               target_size=(args.crop_height, args.crop_width))
+                               target_size=(args.crop_height, args.crop_width)
+                               )
 
 # begin testing
 print("\n***** Begin testing *****")
@@ -84,10 +72,7 @@ print("Num Classes -->", args.num_classes)
 
 print("")
 
-# some other training parameters
-steps = len(test_image_names) // args.batch_size
-
 # testing
-scores = net.evaluate_generator(test_generator, steps=steps, workers=os.cpu_count(), use_multiprocessing=False)
+scores = evaluate(net,test_generator)
 
-print('loss={loss:0.4f}, MeanIoU={mean_iou:0.4f}'.format(loss=scores[0], mean_iou=scores[1]))
+print('Dice Score={0:0.4f}'.format(scores))

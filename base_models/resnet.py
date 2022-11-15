@@ -1,12 +1,3 @@
-"""
-The implementation of ResNet50/101/152 based on Tensorflow.
-Some codes are based on official tensorflow source codes.
-
-@Author: Yang Lu
-@Github: https://github.com/luyanger1799
-@Project: https://github.com/luyanger1799/amazing-semantic-segmentation
-
-"""
 import tensorflow as tf
 
 layers = tf.keras.layers

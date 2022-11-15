@@ -1,11 +1,3 @@
-"""
-The model builder to build different semantic segmentation models.
-
-@Author: Yang Lu
-@Github: https://github.com/luyanger1799
-@Project: https://github.com/luyanger1799/amazing-semantic-segmentation
-
-"""
 from models import *
 from models.pidnet import get_pred_model, PIDNet
 import tensorflow as tf

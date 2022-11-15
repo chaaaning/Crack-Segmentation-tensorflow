@@ -113,14 +113,7 @@ lr_decays = {'poly_decay':PolynomialDecay(initial_learning_rate=args.learning_ra
 lr_decay = lr_decays[args.lr_scheduler]
 
 optimizers = {'adam': tf.keras.optimizers.Adam(learning_rate=lr_decay),
-              # 'nadam': tf.keras.optimizers.Nadam(learning_rate=lr_decay),
               'sgd': tf.keras.optimizers.SGD(learning_rate=lr_decay, momentum=0.99)
-              # 'adamw': AdamW(learning_rate=lr_decay, batch_size=args.batch_size,
-              #                total_iterations=total_iterations),
-              # 'nadamw': NadamW(learning_rate=lr_decay, batch_size=args.batch_size,
-              #                  total_iterations=total_iterations),
-              # 'sgdw': SGDW(learning_rate=lr_decay, momentum=0.99, batch_size=args.batch_size,
-              #              total_iterations=total_iterations)
               }
 
 # training and validation steps
@@ -175,12 +168,7 @@ print("\tChannel Shift -->", args.channel_shift)
 
 print("")
 
-# init wandb
-# experiment = wandb.init(project='crack-detection', resume='allow', anonymous='must')
-# experiment.config.update(dict(epochs=args.num_epochs, batch_size=args.batch_size, learning_rate=args.learning_rate))
-
 epochs = args.num_epochs
-# f1_score = F1Score(classes=2)
 global_steps = 0
 optimizer = optimizers[args.optimizer]
 net.compiled_metrics = None
@@ -204,11 +192,6 @@ for epoch in range(epochs):
 
             pbar.update(images.shape[0])
             global_steps += 1
-            # experiment.log({
-            #     'train loss':loss_val,
-            #     'step':global_steps,
-            #     'epoch':epoch
-            # })
             pbar.set_postfix(**{'loss(batch)':loss_val.numpy()})
 
             # Evaluation
@@ -218,26 +201,9 @@ for epoch in range(epochs):
             export_img_step = (len(train_image_names) // (4 * args.batch_size))
 
             if division_step > 0 or export_img_step > 0:
-                # 10%마다 이미지 저장
-                # if global_steps % export_img_step == 0:
-                #     experiment.log({
-                #         'images':wandb.Image(images[0]),
-                #         'masks':{
-                #             'true':wandb.Image(masks[0,:,:,1]),
-                #             'pred':wandb.Image(tf.argmax(tf.nn.softmax(preds[0],axis=-1),axis=-1))
-                #         }
-                #     })
-
+        
                 if global_steps % division_step == 0:
                     val_score = evaluate(net,valid_generator)
-
-                    # logging.info('Validation F1-Score: {}'.format(val_score))
-                    # experiment.log({
-                    #     'learning_rate':optimizer._decayed_lr('float32').numpy(),
-                    #     'validation Dice-Score':val_score,
-                    #     'step': global_steps,
-                    #     'epoch':epoch
-                    # })
 
             # 명시적으로 loop를 나가게 해줘야함. generator loop가 무한으로 돌기때문에
             batches += 1

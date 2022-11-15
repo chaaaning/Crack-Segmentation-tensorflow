@@ -1,6 +1,3 @@
-# ------------------------------------------------------------------------------
-# Written by Hamid Ali (hamidriasat@gmail.com)
-# ------------------------------------------------------------------------------
 import tensorflow as tf
 import tensorflow.keras.layers as layers
 import tensorflow.keras.models as models

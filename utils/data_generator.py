@@ -34,15 +34,16 @@ class DataIterator(Iterator):
 
     @classmethod
     def load_mask(self,img_path,thick=5):
-        anno_path = img_path.replace("train","train_anno").replace(".png","_PLINE.json")
+        anno_path = ""
+        if "train" in img_path:
+            anno_path = img_path.replace("train","train_anno").replace(".png","_PLINE.json")
+        elif "test" in img_path:
+            anno_path = img_path.replace("test","test_anno").replace(".png","_PLINE.json")
+
         with open(anno_path, 'r', encoding='utf-8') as f:
             contents = f.read()
             json_data = json.loads(contents)
 
-        # str_fname = str(anno_path)
-        # img_pth = Path(
-        #     img_path
-        # )
         # array 형태로 이미지 로드
         load_img = np.array(Image.open(img_path))
         # 검정색 색공간 생성.
