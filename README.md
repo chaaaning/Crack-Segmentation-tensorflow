@@ -14,16 +14,21 @@
 ### 3.1 Structure of code and dataset
 - 학습의 관한 코드 및 데이터는 다음과 같이 이루어져 있음
 ```bash
+├── README.md
 ├── code
+│   ├── README.md
 │   ├── base_models
 │   ├── builders
-│   ├── quantization.ipynb
+│   ├── checkpoints
 │   ├── data_list
 │   ├── eval.py
+│   ├── image_predictions
 │   ├── inference.py
 │   ├── label.txt
 │   ├── models
 │   ├── predictions
+│   ├── quantization.ipynb
+│   ├── streamlit_dashboard.py
 │   ├── test.py
 │   ├── tflite_models
 │   ├── train.py
@@ -33,11 +38,13 @@
 │   ├── test
 │   ├── test_anno
 │   ├── train
-│   └── train_anno
+│   ├── train_anno
+│   └── 대전시_도로_영상_객체_인식_데이터셋_2020_위치정보
 ├── requirements.txt
-└── result
-    ├── pred
-    └── true
+├── result
+│   ├── pred
+│   └── true
+└── 매뉴얼.txt
 ```
 
 #### 3.1.1 Code
@@ -59,7 +66,8 @@
 |quantization.ipynb|학습된 모델의 가중치를 quantization을 적용한 tflite model로 변환하는 코드|
 |tflist_models|tensorflow lite모델이 저장되어 있음                                           |
 |inference.py  |학습된 모델을 이용하여 image와 video에 대한 inference service를 제공         |
-|predictions|inference.py를 실행한 결과가 저장됨|
+|image_predictions|inference.py 실행 결과가 저장됨|
+|streamlit_dashboard.py|streamlit을 이용하여 데이터를 웹에서 시각화해줌|
 
 
 #### 3.1.2 Dataset
@@ -69,6 +77,7 @@
 |train_anno|학습 이미지 데이터의 annotation 정보    |
 |test      |테스트 이미지 데이터셋                  |
 |test_anno |테스트 이미지 데이터셋의 annotation 정보|
+|대전시_도로_영상_객체_인식_데이터셋_2020_위치정보|대전시 도로 이미지 및 관련 json 파일|
 
 #### 3.1.3 Model Weights 파일
 ```bash
@@ -206,7 +215,7 @@ streamlit run streamlit_dashboard.py
 - `streamlit_dashboard`에서 제공하는 정보는 운용 환경, requirements, 추론 결과 DataFrame, histogram, boxplot, heatmap 이 있음
 - 현재 버전은 대전시 도로 영상 객체 인식 데이터 셋을 기준으로 만들어 졌기 때문에 해당 데이터 셋의 결과에 맞게 끔 최적화 되어 있음
 - [streamlit 공식문서](https://docs.streamlit.io/)를 참조하여 추가적인 기능을 생성할 수 있음
-​
+
 
 ### 4.5 Quantized tensorflow lite model in Mobile
 - 학습된 tensorflow model을 모바일에 넣기 위해서 Quantied Tensorflow lite 모델로 변환함
