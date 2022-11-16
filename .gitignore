@@ -4,3 +4,4 @@ __pycache__
 inference/
 .idea/
 result/
+image_predictions/masking_result.csv

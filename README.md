@@ -39,6 +39,7 @@
     ├── pred
     └── true
 ```
+
 #### 3.1.1 Code
 - [Amazing-Semantic-Segmentation](https://github.com/luyanger1799/Amazing-Semantic-Segmentation#readme) 코드를 참조하여 학습을 진행함
   
@@ -68,6 +69,21 @@
 |train_anno|학습 이미지 데이터의 annotation 정보    |
 |test      |테스트 이미지 데이터셋                  |
 |test_anno |테스트 이미지 데이터셋의 annotation 정보|
+
+#### 3.1.3 Model Weights 파일
+```bash
+├── DeepLabV3Plus_based_on_MobileNetV2_29.h5
+├── PAN_based_on_MobileNetV2_29.h5
+├── UNet_based_on_MobileNetV2_CE.h5
+├── UNet_based_on_MobileNetV2_CE_QAT_288384.h5
+├── UNet_based_on_MobileNetV2_CE_QAT_288384_50000.h5
+├── UNet_based_on_MobileNetV2_CE_QAT_288384_aug.h5
+├── UNet_based_on_MobileNetV2_QAT.h5
+├── UNet_based_on_MobileNetV2_gamma_2.h5
+├── UNet_based_on_MobileNetV2_gamma_5.h5
+└── UNet_based_on_VGG16_29.h5
+```
+- `UNet_based_on_MobileNetV2_CE_QAT_288384_50000.h5` 파일이 최종 생성 모델 파일임
 
 ### 3.2 Parameter
 - 다음과 같은 조건으로 parameter를 지정하여 학습을 진행함
@@ -170,7 +186,7 @@ python test.py --model UNet --base_model MobileNetV2 --batch_size 16 --crop_heig
     --frame : video inference 시 frame을 지정
 '''
 ​
-python inference.py --model UNet --base_model MobileNetV2 --crop_height 288 --crop_width 384 --num_classes 2 --weights "./weights/UNet_based_on_MobileNetV2_CE_QAT_288384_50000.h5" --input_path "D:/data/dj_data/대전시_도로_영상_객체_인식_데이터셋_2020_위치정보/images" --json_path "D:/data/dj_data/대전시_도로_영상_객체_인식_데이터셋_2020_위치정보/DataSetIII.json" --is_save True --file_type image
+python inference.py --model UNet --base_model MobileNetV2 --crop_height 288 --crop_width 384 --num_classes 2 --weights "./weights/UNet_based_on_MobileNetV2_CE_QAT_288384_50000.h5" --input_path "../data/대전시_도로_영상_객체_인식_데이터셋_2020_위치정보/images" --json_path "../data/대전시_도로_영상_객체_인식_데이터셋_2020_위치정보/DataSetIII.json" --is_save True --file_type image
 ```
 - 학습된 모델을 이용하여 대전시 도로 영상 객체 인식 데이터셋에 대한 inference 함
 - 추론 결과는 `./image_predictions`에 저장함
