@@ -13,7 +13,7 @@ import os
 import pandas as pd
 
 # split train and validation
-def permutation_train_test_split(data_path,val_size=0.1, shuffle=True,random_state=84):
+def permutation_train_test_split(data_path,val_size=0.1, shuffle=True,random_state=80):
     data_list = np.genfromtxt('./data_list/extract_50k.csv',delimiter=',',skip_header=1,dtype=str)[:,1] # file name list를 불러옴
     val_num = int(len(data_list)*val_size)
     train_num = len(data_list) - val_num
@@ -31,6 +31,8 @@ def permutation_train_test_split(data_path,val_size=0.1, shuffle=True,random_sta
 
     train = [os.path.join(data_path,img_name) for img_name in data_list[:train_num]]
     val = [os.path.join(data_path,img_name) for img_name in data_list[train_num:]]
+
+    
 
     # 이미지명들이 train, val로 나뉘어 결과가 return됨
     return train, val

@@ -116,7 +116,6 @@ class DataIterator(Iterator):
             image = imagenet_utils.preprocess_input(image.astype('float32'), data_format='channels_last',
                                                     mode='torch')
 
-            # label = tf.squeeze(label,axis=-1)  # 차원 하나 감소
             label = tf.one_hot(label,self.num_classes,axis=-1) # 기존의 one-hot encoding이 잘못된것은 아닐까....
 
             batch_x[i], batch_y[i] = image, label

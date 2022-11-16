@@ -88,7 +88,7 @@ if is_quantize:
 # load weights
 if args.weights is not None:
     print('Loading the weights...')
-    net.load_weights(args.weights)
+    net.load_weights()
 
 # chose loss
 losses = {'ce': categorical_crossentropy_with_logits,
