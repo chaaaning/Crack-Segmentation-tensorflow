@@ -32,8 +32,6 @@ def permutation_train_test_split(data_path,val_size=0.1, shuffle=True,random_sta
     train = [os.path.join(data_path,img_name) for img_name in data_list[:train_num]]
     val = [os.path.join(data_path,img_name) for img_name in data_list[train_num:]]
 
-    
-
     # 이미지명들이 train, val로 나뉘어 결과가 return됨
     return train, val
 
