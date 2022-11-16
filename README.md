@@ -166,7 +166,24 @@ python train.py --model UNet --base_model MobileNetV2 --loss ce --batch_size 16 
     --weights : load할 가중치파일의 경로를 지정
     --isQAT : QAT(Quantization Aware Training)을 적용한 모델이므로 yes를 지정
 '''
+# 모델별 실험
+# UNet
+python test.py --model UNet --base_model MobileNetV2 --batch_size 32 --weight ./weights/UNet_based_on_MobileNetV2_CE.h5 --dataset ../data/test --num_classes 2
 
+# PAN
+python test.py --model PAN --base_model MobileNetV2 --batch_size 32 --weight ./weights/PAN_based_on_MobileNetV2_29.h5 --dataset ../data/test --num_classes 2
+
+# DeepLabV3Plus
+python test.py --model DeepLabV3Plus --base_model MobileNetV2 --batch_size 32 --weight ./weights/DeepLabV3Plus_based_on_MobileNetV2_29.h5 --dataset ../data/test --num_classes 2
+
+# Base 모델별 실험
+# MobileNetV2
+python test.py --model UNet --base_model MobileNetV2 --batch_size 32 --weight ./weights/UNet_based_on_MobileNetV2_CE.h5 --dataset ../data/test --num_classes 2
+
+# VGG16
+python test.py --model UNet --base_model VGG16 --batch_size 16 --weight ./weights/UNet_based_on_VGG16_29.h5 --dataset ../data/test --num_classes 2
+
+# 최종 모델 실험
 python test.py --model UNet --base_model MobileNetV2 --batch_size 16 --crop_height 288 --crop_width 384 --weight ./weights/UNet_based_on_MobileNetV2_CE_QAT_288384_50000.h5 --dataset ../data/test --num_classes 2 --isQAT yes
 ```
 - 학습된 모델을 이용하여 test dataset을 test함
