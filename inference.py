@@ -2,8 +2,7 @@ from utils.utils import load_image, decode_one_hot
 from keras_applications import imagenet_utils
 from builders import builder
 from scipy.sparse import csr_matrix
-# from PIL import Image
-# import matplotlib.pyplot as plt
+import tensorflow_model_optimization as tfmot
 import tensorflow as tf
 import numpy as np
 import pandas as pd
@@ -28,6 +27,7 @@ parser.add_argument('--img_save_path', help='The path of predicted image.', type
 parser.add_argument('--vdo_save_path', help='The path of predicted video.', type=str, default=os.path.join(os.getcwd(), 'video_predictions'))
 parser.add_argument('--json_path', help='The path of to load json.', type=str, default=None)
 parser.add_argument('--is_save', help='save options.', type=bool, default=False)
+parser.add_argument('--is_quantize', help='Input quantize T or F.', type=bool, default=True)
 parser.add_argument('--file_type', help='choose image or video', type=str, choices=["image", "video"], required=True)
 parser.add_argument('--frame', help='If you input video file, need frame', type=int, default=30)
 
@@ -107,8 +107,14 @@ def calc_masking_rate(arr, width, height):
 
 #######################
 
+# quatization
+quantize_model = tfmot.quantization.keras.quantize_model
+
 # build the model
 net, base_model = builder(args.num_classes, (args.crop_height, args.crop_width), args.model, args.base_model)
+
+if args.is_quantize:
+    net = quantize_model(net)
 
 # load weights
 print('Loading the weights...')
@@ -138,6 +144,8 @@ if args.file_type=="image":
         df_json = json_to_df(args.json_path)
         image_names = df_json["name"]+"."+df_json["format"]
         image_names = image_names.apply(lambda x: os.path.basename(x))
+        init_image = None
+        prediction = None
 
         # make ETL pipeline initialization -> output json
         # 들어 가야할 내용 : 'path', 'name', 'format', 'latitude', 'longitude'
@@ -151,7 +159,7 @@ if args.file_type=="image":
         for i, img_name in enumerate(image_names):
 
             # loading image & convert dim
-            img_pname = args.image_path+"\\"+img_name.split(".")[0]+"\\"+img_name
+            img_pname = args.input_path+"\\"+img_name.split(".")[0]+"\\"+img_name
             init_image = cv2.resize(load_image(img_pname), dsize=(args.crop_width, args.crop_height))
             prediction = im_pred(init_image, net)
             
