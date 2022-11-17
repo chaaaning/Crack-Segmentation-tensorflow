@@ -148,7 +148,6 @@ pip install -r requirements.txt
 '''
 python train.py --model UNet --base_model MobileNetV2 --loss ce --batch_size 16 --valid_batch_size 16 --crop_height 288 --crop_width 384 --num_epochs 20 --dataset ../data/train --random_seed 80 --num_classes 2 --learning_rate 1e-3
 ```
-- 
 - 매 epoch마다 `weight`폴더에 학습된 모델의 가중치가 저장됨
 - 1epoch당 2번의 validation을 진행(wandb를 이용하여 기록을 진행했으나 제출코드에서는 제거함)
   
@@ -227,7 +226,7 @@ python inference.py --model UNet --base_model MobileNetV2 --crop_height 288 --cr
     pip install pydeck
     pip install seaborn
 '''
-streamlit run streamlit_dashboard.py
+streamlit run streamlit_dashboard.py --browser.serverAddress localhost
 ```
 - `streamlit_dashboard`에서 제공하는 정보는 운용 환경, requirements, 추론 결과 DataFrame, histogram, boxplot, heatmap 이 있음
 - 현재 버전은 대전시 도로 영상 객체 인식 데이터 셋을 기준으로 만들어 졌기 때문에 해당 데이터 셋의 결과에 맞게 끔 최적화 되어 있음

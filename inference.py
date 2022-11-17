@@ -159,7 +159,7 @@ if args.file_type=="image":
         for i, img_name in enumerate(image_names):
 
             # loading image & convert dim
-            img_pname = args.input_path+"\\"+img_name.split(".")[0]+"\\"+img_name
+            img_pname = args.input_path+"/"+img_name.split(".")[0]+"/"+img_name
             init_image = cv2.resize(load_image(img_pname), dsize=(args.crop_width, args.crop_height))
             prediction = im_pred(init_image, net)
             
