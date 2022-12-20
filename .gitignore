@@ -4,5 +4,6 @@ __pycache__
 inference/
 .idea/
 result/
-image_predictions/*.jpg
-image_predictions/*.csv
+
+image_predictions
+image_predictionss

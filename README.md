@@ -1,3 +1,21 @@
+- [1. 개요](#1-개요)
+- [2. Training Environment](#2-training-environment)
+- [3. Model](#3-model)
+    - [3.1. Structure of code and dataset](#31-structure-of-code-and-dataset)
+        - [3.1.1. code ](#311-code)
+        - [3.1.2. dataset](#312-dataset)
+        - [3.1.3. model weights file](#313-model-weights-파일)
+    - [3.2. Parameter](#32-parameter)
+    - [3.3. Model Input/Outplut](#33-모델의-입출력)
+- [4. How to use](#4-how-to-use)
+    - [4.1. Setting Envirionment](#41-환경-세팅)
+    - [4.2. Train](#42-train)
+    - [4.3. Test](#43-test)
+    - [4.4. Inference](#44-inference)
+        - [4.4.1. Image/Video File Inference](#441-image--video-file-inference)
+        - [4.4.2. Use Dashboard](#442-use-dashboard)
+    - [4.5. Quantized tensorflow lite model in Mobile](#45-quantized-tensorflow-lite-model-in-mobile)
+
 ## 1. 개요
 - AI hub에 구축되어 있는 [도로장애물/표면 인지 영상(수도권)](https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=realm&dataSetSn=179) 데이터 셋을 이용하여 자동으로 도로의 크랙을 탐지할 수 있는 모델을 생성하고, 이를 모바일 환경에서 작동할 수 있도록 경량화한 모델을 개발함
 - `MobilnetV2` 기반 `UNet` 모델을 `QAT(Quantization Aware Training)`방식으로 학습을 수행하고, `Dynamic Quantization`을 사용하여 경량화된 모델을 개발함

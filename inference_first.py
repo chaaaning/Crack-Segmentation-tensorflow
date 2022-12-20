@@ -72,6 +72,11 @@ def json_to_df(json_path, save=False):
             'latitude', 'longitude', 'countRegions', 'parentRealName', 'assetTags',  
             'predicted_by_api']
     
+    # 유동적으로 하고 싶다면,
+    # check_key_set = set()
+    # for i in range(len(json_data["assets"])):
+    #     check_key_set = check_key_set.union(set(json_data["assets"][i]["image"].keys()))
+    # key_list = list(check_key_set)
     to_make_pd_dict = dict()
 
     for i in range(len(json_data["assets"])):
@@ -99,14 +104,6 @@ def json_to_df(json_path, save=False):
 def calc_masking_rate(arr, width, height):
     masking_val = arr.sum()
     return (masking_val*100)/(width*height)
-
-# -- 5. 파일 하위 경로 탐색하여 이미지 리스트 생성
-def find_files(input_path):
-    file_list = []
-    for path, dirs, files in os.walk(input_path):
-        for file in files:
-            file_list.append(os.path.join(path, file))
-    return file_list
 
 #######################
 
@@ -144,17 +141,20 @@ if args.file_type=="image":
     ## Keyboard Interrupt가 발생하면 저장할 수 있도록 코드 라인 (try-except) 형성
     try:
         # load_images & json
-        if args.json_path is not None:
-            df_json = json_to_df(args.json_path)
-            image_names = df_json["name"]+"."+df_json["format"]
-            image_names = image_names.apply(lambda x: os.path.basename(x))
-            mask_indptr, mask_indices, masking_rates = [], [], []
-        else:
-            image_names = find_files(args.input_path)
-            
+        df_json = json_to_df(args.json_path)
+        image_names = df_json["name"]+"."+df_json["format"]
+        image_names = image_names.apply(lambda x: os.path.basename(x))
         init_image = None
         prediction = None
-        
+
+        # make ETL pipeline initialization -> output json
+        # 들어 가야할 내용 : 'path', 'name', 'format', 'latitude', 'longitude'
+        # key_list = ['path', 'name', 'format', 'latitude', 'longitude']
+        # data_extract = dict()
+# for key in key_list:    # dictionary 초기화 (json을 어떻게 넘길까 고민,,)
+        #     data_extract[key] = []
+
+        mask_indptr, mask_indices, masking_rates = [], [], []
         # predict & save
         for i, img_name in enumerate(image_names):
 
@@ -163,11 +163,10 @@ if args.file_type=="image":
             init_image = cv2.resize(load_image(img_pname), dsize=(args.crop_width, args.crop_height))
             prediction = im_pred(init_image, net)
             
-            if args.json_path is not None:
-                csr_mat = csr_matrix(prediction)
-                mask_indptr.append(csr_mat.indptr.tolist())
-                mask_indices.append(csr_mat.indices.tolist())
-                masking_rates.append(calc_masking_rate(prediction, args.crop_width, args.crop_height))
+            csr_mat = csr_matrix(prediction)
+            mask_indptr.append(csr_mat.indptr.tolist())
+            mask_indices.append(csr_mat.indices.tolist())
+            masking_rates.append(calc_masking_rate(prediction, args.crop_width, args.crop_height))
             
             # save the prediction
             if args.is_save:
@@ -185,13 +184,12 @@ if args.file_type=="image":
             
             sys.stdout.write('\rRunning test image %d / %d'%(i+1, len(image_names)))
             sys.stdout.flush()
-        
-        if args.json_path is not None:    
-            save_df = df_json.iloc[:,:].copy()
-            save_df["mask_indptr"] = mask_indptr
-            save_df["mask_indices"] = mask_indices
-            save_df["masking_rate"] = masking_rates
-            save_df.to_csv(os.path.join(save_path, "masking_result.csv"), index=False)
+            
+        save_df = df_json.iloc[:,:].copy()
+        save_df["mask_indptr"] = mask_indptr
+        save_df["mask_indices"] = mask_indices
+        save_df["masking_rate"] = masking_rates
+        save_df.to_csv(os.path.join(save_path, "masking_result.csv"), index=False)
         
             
     except:
@@ -199,16 +197,13 @@ if args.file_type=="image":
         cv2.imwrite(os.path.join(save_path, img_name), img_mask_merge)
         
         print("")
-        if args.json_path is not None:
-            print(f"Interrupt !! save result data ...")
-            save_df = df_json.iloc[:i,:].copy()
-            save_df["mask_indptr"] = mask_indptr
-            save_df["mask_indices"] = mask_indices
-            save_df["masking_rate"] = masking_rates
-            save_df.to_csv(os.path.join(save_path, "masking_result.csv"), index=False)
-            print(f"Saved Result CSV !!!")
-        else:
-            print(f"Interrupt !! Saving {i} files!!")
+        print(f"Interrupt !! save result data ...")
+        save_df = df_json.iloc[:i,:].copy()
+        save_df["mask_indptr"] = mask_indptr
+        save_df["mask_indices"] = mask_indices
+        save_df["masking_rate"] = masking_rates
+        save_df.to_csv(os.path.join(save_path, "masking_result.csv"), index=False)
+        print(f"Saved Result CSV !!!")
 
 #### inference file이 video 일 때        
 else:
