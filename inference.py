@@ -6,7 +6,6 @@ import tensorflow_model_optimization as tfmot
 import tensorflow as tf
 import numpy as np
 import pandas as pd
-import json
 import argparse
 import sys
 import cv2
@@ -25,8 +24,7 @@ parser.add_argument('--weights', help='The path of weights to be loaded.', type=
 parser.add_argument('--input_path', help='The path of to enable image.', type=str, required=True)
 parser.add_argument('--img_save_path', help='The path of predicted image.', type=str, default=os.path.join(os.getcwd(), 'image_predictions'))
 parser.add_argument('--vdo_save_path', help='The path of predicted video.', type=str, default=os.path.join(os.getcwd(), 'video_predictions'))
-parser.add_argument('--json_path', help='The path of to load json.', type=str, default=None)
-parser.add_argument('--is_save', help='save options.', type=bool, default=False)
+parser.add_argument('--is_DFsave', help='If you want to save DataFrame Format.', type=bool, default=False)
 parser.add_argument('--is_quantize', help='Input quantize T or F.', type=bool, default=True)
 parser.add_argument('--file_type', help='choose image or video', type=str, choices=["image", "video"], required=True)
 parser.add_argument('--frame', help='If you input video file, need frame', type=int, default=30)
@@ -63,37 +61,37 @@ def im_pred(init_image, pred_net):
     return np_prediction
     
 # -- 3. 추가 데이터 수집 로직을 위한 json Load
-def json_to_df(json_path, save=False):
-    with open(json_path, "r") as f:
-        json_data = json.load(f)
+# def json_to_df(json_path, save=False):
+#     with open(json_path, "r") as f:
+#         json_data = json.load(f)
         
-    # 컬럼명을 정리하고 싶다면,
-    key_list = ['id', 'path', 'size', 'name', 'format', 'timestamp', 'record_time',
-            'latitude', 'longitude', 'countRegions', 'parentRealName', 'assetTags',  
-            'predicted_by_api']
+#     # 컬럼명을 정리하고 싶다면,
+#     key_list = ['id', 'path', 'size', 'name', 'format', 'timestamp', 'record_time',
+#             'latitude', 'longitude', 'countRegions', 'parentRealName', 'assetTags',  
+#             'predicted_by_api']
     
-    to_make_pd_dict = dict()
+#     to_make_pd_dict = dict()
 
-    for i in range(len(json_data["assets"])):
-        if i==0:
-            for key in key_list:
-                try:
-                    to_make_pd_dict[key] = [json_data["assets"][i]["image"][key]]
-                except:
-                    to_make_pd_dict[key] = [np.nan]
-        else:
-            for key in key_list:
-                try:
-                    to_make_pd_dict[key].append(json_data["assets"][i]["image"][key])
-                except:
-                    to_make_pd_dict[key].append(np.nan)
+#     for i in range(len(json_data["assets"])):
+#         if i==0:
+#             for key in key_list:
+#                 try:
+#                     to_make_pd_dict[key] = [json_data["assets"][i]["image"][key]]
+#                 except:
+#                     to_make_pd_dict[key] = [np.nan]
+#         else:
+#             for key in key_list:
+#                 try:
+#                     to_make_pd_dict[key].append(json_data["assets"][i]["image"][key])
+#                 except:
+#                     to_make_pd_dict[key].append(np.nan)
                     
-    json_df = pd.DataFrame(to_make_pd_dict)
+#     json_df = pd.DataFrame(to_make_pd_dict)
     
-    if save:
-        json_df.to_csv(os.path.basename(json_path).rstrip(".json")+".csv", index=False)
+#     if save:
+#         json_df.to_csv(os.path.basename(is_DFsaveson")+".csv", index=False)
         
-    return json_df
+#     return json_df
 
 # -- 4. masking rate calculate    
 def calc_masking_rate(arr, width, height):
@@ -144,68 +142,64 @@ if args.file_type=="image":
     ## Keyboard Interrupt가 발생하면 저장할 수 있도록 코드 라인 (try-except) 형성
     try:
         # load_images & json
-        if args.json_path is not None:
-            df_json = json_to_df(args.json_path)
-            image_names = df_json["name"]+"."+df_json["format"]
-            image_names = image_names.apply(lambda x: os.path.basename(x))
+        image_names = find_files(args.input_path)
+        if args.is_DFsave:
             mask_indptr, mask_indices, masking_rates = [], [], []
-        else:
-            image_names = find_files(args.input_path)
             
-        init_image = None
-        prediction = None
+        init_image, prediction = None, None
         
         # predict & save
         for i, img_name in enumerate(image_names):
 
             # loading image & convert dim
-            img_pname = args.input_path+"/"+img_name.split(".")[0]+"/"+img_name
-            init_image = cv2.resize(load_image(img_pname), dsize=(args.crop_width, args.crop_height))
+            # img_pname = args.input_path+"/"+img_name.split(".")[0]+"/"+img_name
+            init_image = cv2.resize(load_image(img_name), dsize=(args.crop_width, args.crop_height))
             prediction = im_pred(init_image, net)
             
-            if args.json_path is not None:
+            if args.is_DFsave:
                 csr_mat = csr_matrix(prediction)
                 mask_indptr.append(csr_mat.indptr.tolist())
                 mask_indices.append(csr_mat.indices.tolist())
                 masking_rates.append(calc_masking_rate(prediction, args.crop_width, args.crop_height))
             
             # save the prediction
-            if args.is_save:
-                if i==0:
-                    # _, file_name = os.path.split(img_name)
-                    if os.path.exists(args.img_save_path):
-                        save_path = args.img_save_path
-                    else:
-                        save_path = os.path.join(os.getcwd(), 'image_predictions')
-                        os.mkdir(save_path)
-                        print("make image prediction save path !")
+            
+            if i==0:
+                if os.path.exists(args.img_save_path):
+                    save_path = args.img_save_path
+                else:
+                    save_path = os.path.join(os.getcwd(), 'image_predictions')
+                    os.mkdir(save_path)
+                    print("make image prediction save path !")
 
-                img_mask_merge = merge_img(init_image, prediction, (args.crop_width, args.crop_height))
-                cv2.imwrite(os.path.join(save_path, img_name), img_mask_merge) 
+            img_mask_merge = merge_img(init_image, prediction, (args.crop_width, args.crop_height))
+            cv2.imwrite(os.path.join(save_path, os.path.basename(img_name)), img_mask_merge) 
             
             sys.stdout.write('\rRunning test image %d / %d'%(i+1, len(image_names)))
             sys.stdout.flush()
         
-        if args.json_path is not None:    
-            save_df = df_json.iloc[:,:].copy()
+        if args.is_DFsave:    
+            save_df = pd.DataFrame()
+            save_df["image_path"] = image_names
             save_df["mask_indptr"] = mask_indptr
             save_df["mask_indices"] = mask_indices
             save_df["masking_rate"] = masking_rates
-            save_df.to_csv(os.path.join(save_path, "masking_result.csv"), index=False)
-        
+            save_df.to_csv(os.path.join(save_path, "masking_result.csv"), index=False, encoding="euc-kr")   
             
     except:
         img_mask_merge = merge_img(init_image, prediction, (args.crop_width, args.crop_height))
         cv2.imwrite(os.path.join(save_path, img_name), img_mask_merge)
         
         print("")
-        if args.json_path is not None:
+        if args.is_DFsave:
             print(f"Interrupt !! save result data ...")
-            save_df = df_json.iloc[:i,:].copy()
+
+            save_df = pd.DataFrame()
+            save_df["image_path"] = image_names[:i]
             save_df["mask_indptr"] = mask_indptr
             save_df["mask_indices"] = mask_indices
             save_df["masking_rate"] = masking_rates
-            save_df.to_csv(os.path.join(save_path, "masking_result.csv"), index=False)
+            save_df.to_csv(os.path.join(save_path, "masking_result.csv"), index=False, encoding="euc-kr")
             print(f"Saved Result CSV !!!")
         else:
             print(f"Interrupt !! Saving {i} files!!")
@@ -220,14 +214,14 @@ else:
             capture.set(cv2.CAP_PROP_FRAME_HEIGHT, args.crop_height)
 
             fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-            if args.is_save:
-                if os.path.exists(args.vdo_save_path):
-                    save_path = args.vdo_save_path
-                else:
-                    save_path = os.path.join(os.getcwd(), 'video_predictions')
-                    os.mkdir(save_path)
-                    print("make video save path !")
-                out = cv2.VideoWriter(os.path.join(save_path, video_name), fourcc, args.frame, (args.crop_width, args.crop_height))
+            
+            if os.path.exists(args.vdo_save_path):
+                save_path = args.vdo_save_path
+            else:
+                save_path = os.path.join(os.getcwd(), 'video_predictions')
+                os.mkdir(save_path)
+                print("make video save path !")
+            out = cv2.VideoWriter(os.path.join(save_path, video_name), fourcc, args.frame, (args.crop_width, args.crop_height))
             
             
             while cv2.waitKey(33) < 0:
@@ -241,18 +235,15 @@ else:
                 convert_img = merge_img(init_frame, pred_img, (args.crop_width, args.crop_height), False)
                 
                 cv2.imshow("Test Vidoe Crack Detect", convert_img)
-                if args.is_save:
-                    out.write(convert_img)
+                out.write(convert_img)
 
                 capture.release()
-                if args.is_save:
-                    out.release()
-                    print("Inference SAVE !!!")
+                out.release()
+                print("Inference SAVE !!!")
                 cv2.destroyAllWindows()
             
     except KeyboardInterrupt:
-            if args.is_save:
-                print("Keyboard Interrupt !")
-                out.release()
-                print("Saved Current Video!")
+            print("Keyboard Interrupt !")
+            out.release()
+            print("Saved Current Video!")
             cv2.destroyAllWindows()
