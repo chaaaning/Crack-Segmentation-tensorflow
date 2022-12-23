@@ -79,6 +79,7 @@ net, base_model = builder(args.num_classes, (args.crop_height, args.crop_width),
 
 is_quantize = True
 
+# QAT를 진행한다면 전체 모델에 QAT를 적용
 if is_quantize:
     net = quantize_model(net)
 
