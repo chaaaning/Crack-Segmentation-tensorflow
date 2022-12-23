@@ -223,16 +223,21 @@ python test.py --model UNet --base_model MobileNetV2 --batch_size 16 --crop_heig
     --img_save_path : image inference save_path, default 시 현재 경로 생성
     --vdo_save_path : video inference save_path, default 시 현재 경로 생성
     --json_path : 추론에 활용되는 data set (대전시 도로 영상 객체 인식)의 정보를 담는 json 파일의 경로 지정
-    --is_save : 추론 결과 저장 여부로 True로 지정
+    --is_DFsave : 추론 결과를 pd.DataFrame 형태로 저장 여부를 지정 (json_path 인자 입력 시 True로 자동 설정)
     --is_quantize : tf.lite를 활용한 모델을 사용할 경우 True로 지정
     --file_type : image와 video 중 하나를 지정해야 하므로 image 지정
     --frame : video inference 시 frame을 지정
 '''
-​
-python inference.py --model UNet --base_model MobileNetV2 --crop_height 288 --crop_width 384 --num_classes 2 --weights "./weights/UNet_based_on_MobileNetV2_CE_QAT_288384_50000.h5" --input_path "../data/대전시_도로_영상_객체_인식_데이터셋_2020_위치정보/images" --json_path "../data/대전시_도로_영상_객체_인식_데이터셋_2020_위치정보/DataSetIII.json" --is_save True --file_type image
+
+python inference.py --model UNet --base_model MobileNetV2 --crop_height 288 --crop_width 384 --num_classes 2 --weights "./weights/UNet_based_on_MobileNetV2_CE_QAT_288384_50000.h5" --input_path "../data/대전시_도로_영상_객체_인식_데이터셋_2020_위치정보/images" --json_path "../data/대전시_도로_영상_객체_인식_데이터셋_2020_위치정보/DataSetIII.json" --file_type image
 ```
 - 학습된 모델을 이용하여 대전시 도로 영상 객체 인식 데이터셋에 대한 inference 함
-- 추론 결과는 `./image_predictions`에 저장함
+- inference에 활용할 데이터는 `root/data` 디렉토리에 미리 저장하고, 그에 맞게끔 `input_path`를 지정
+- `input_path`의 하위 디렉토리는 몇 단계가 이어지더라도 상관없으나, 이미지 파일만 있어야 함 (`jpg`, `jpeg`, `png` 등)
+- 추론 결과는 `./<file_type 입력값>_predictions`에 저장함 (`file_type`이 image이면 `image_predictions`에 저장)
+- `is_DFsave` 옵션은 추론 결과에 대한 내용을 `pd.DataFrame`형태로 저장하지만, `json_path`가 입력되면 자동으로 `True`로 설정됨
+- `json_path`는 `root/data`의 하위 디렉토리에 `json`파일을 저장하고, 절대 경로의 형태로 입력
+- `json_path`가 입력되지 않더라도, `is_DFsave`옵션을 통해 masking 비율 정보를 저장할 수 있음 (`is_DFsave`를 지정하지 않으면 추론 이미지만을 저장)
 - 다른 이미지, 비디오 데이터에 대해 추론 가능하나, 대전시 도로 영상 객체 인식 데이터 셋에 대해 추론 결과를 이미지로 저장하고 Making Ratio를 계산하여 이미지에 추론 결과를 `.csv`파일로 저장함
 - 이 때, 마스킹 정보는 `mask_indptr`과 `mask_indices`에 따로 저장하여 `csr_matrix`형식으로 불러 올 수 있음 (load 시 `scipy.sparse.csr_matrix` 활용 권장)
 ​
@@ -247,7 +252,7 @@ python inference.py --model UNet --base_model MobileNetV2 --crop_height 288 --cr
 streamlit run streamlit_dashboard.py --browser.serverAddress localhost
 ```
 - `streamlit_dashboard`에서 제공하는 정보는 운용 환경, requirements, 추론 결과 DataFrame, histogram, boxplot, heatmap 이 있음
-- 현재 버전은 대전시 도로 영상 객체 인식 데이터 셋을 기준으로 만들어 졌기 때문에 해당 데이터 셋의 결과에 맞게 끔 최적화 되어 있음
+- 현재 버전은 [kisti의 도로 영상 객체 데이터셋](https://aida.kisti.re.kr/data/4fa7657c-5d21-4a20-bca9-ca53ac4c85e4)을 기준으로 만들어 졌기 때문에 해당 데이터 셋의 결과에 맞게 끔 최적화 되어 있음
 - [streamlit 공식문서](https://docs.streamlit.io/)를 참조하여 추가적인 기능을 생성할 수 있음
 
 
