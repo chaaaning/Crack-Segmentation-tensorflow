@@ -40,7 +40,7 @@
 │   ├── checkpoints
 │   ├── data_list
 │   ├── eval.py
-│   ├── image_predictions
+│   ├── image_predictions   //inference.py 실행 시 자동 생성
 │   ├── inference.py
 │   ├── label.txt
 │   ├── models
@@ -62,7 +62,7 @@
 ├── result
 │   ├── pred
 │   └── true
-└── 매뉴얼.txt
+└── 매뉴얼.ipynb
 ```
 
 #### 3.1.1 Code
@@ -84,7 +84,7 @@
 |quantization.ipynb|학습된 모델의 가중치를 quantization을 적용한 tflite model로 변환하는 코드|
 |tflist_models|tensorflow lite모델이 저장되어 있음                                           |
 |inference.py  |학습된 모델을 이용하여 image와 video에 대한 inference service를 제공         |
-|image_predictions|inference.py 실행 결과가 저장됨|
+|image_predictions|inference.py 실행 결과가 저장됨(inference.py 실행 시 자동 생성)|
 |streamlit_dashboard.py|streamlit을 이용하여 데이터를 웹에서 시각화해줌|
 
 

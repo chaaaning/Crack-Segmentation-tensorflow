@@ -3,7 +3,6 @@ checkpoints/
 __pycache__
 inference/
 .idea/
-result/
-
+# result/
 image_predictions
-image_predictionss
+
