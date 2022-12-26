@@ -1,8 +1,10 @@
 wandb/
 checkpoints/
 __pycache__
-inference/
 .idea/
-# result/
-image_predictions
+/data/inference_data/images/**
+!/data/inference_data/images/*.txt
+/data/inference_data/*.json
+/result/image_inferences
+*.mp4
 

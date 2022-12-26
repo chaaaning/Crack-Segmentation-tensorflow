@@ -23,9 +23,8 @@ parser.add_argument('--num_classes', help='The number of classes to be segmented
 parser.add_argument('--crop_height', help='The height to crop the image.', type=int, default=256)
 parser.add_argument('--crop_width', help='The width to crop the image.', type=int, default=256)
 parser.add_argument('--weights', help='The path of weights to be loaded.', type=str, default=None)
-parser.add_argument('--input_path', help='The path of to enable image.', type=str, required=True)
-parser.add_argument('--json_path', help='The path of to load json.', type=str, default=None)
-parser.add_argument('--save_path', help='The path of predicted image.', type=str, default=os.path.join(os.getcwd(), '_inference'))
+# parser.add_argument('--input_path', help='The path of to enable image.', type=str, required=True)
+# parser.add_argument('--json_path', help='The path of to load json.', type=str, default=None)
 parser.add_argument('--is_DFsave', help='If you want to save DataFrame Format.', type=bool, default=False)
 parser.add_argument('--is_quantize', help='Input quantize T or F.', type=bool, default=True)
 parser.add_argument('--file_type', help='choose image or video', type=str, choices=["image", "video"], required=True)
@@ -33,7 +32,13 @@ parser.add_argument('--frame', help='If you input video file, need frame', type=
 
 args = parser.parse_args()
 
-is_DFsave = True if args.json_path is not None else args.is_DFsave
+save_path = os.path.join(os.path.abspath("../result"), args.file_type+"_inferences")
+input_path = os.path.abspath("../data/inference_data/images")
+json_path = None
+for name in os.listdir(os.path.abspath("../data/inference_data")):
+    if name[-4:] == "json":
+        json_path=os.path.join(os.path.abspath("../data/inference_data"), name)
+is_DFsave = True if json_path is not None else args.is_DFsave
 
 ### 필요한 함수 정의 ###
 # -- 1. image와 prediction 합치기
@@ -145,8 +150,9 @@ print("Crop Height -->", args.crop_height)
 print("Crop Width -->", args.crop_width)
 print("Num Classes -->", args.num_classes)
 print("Inference Type -->", args.file_type)
-print("Json Save -->", False if args.json_path is None else True)
+print("Json Save -->", False if json_path is None else True)
 print("DataFrame Result Save -->", is_DFsave)
+print("Save Path -->", save_path)
 
 print("")
 
@@ -155,15 +161,18 @@ if args.file_type=="image":
     ## Keyboard Interrupt가 발생하면 저장할 수 있도록 코드 라인 (try-except) 형성
     try:
         # load_images & json
-        image_names = find_files(args.input_path)
+        image_names = find_files(input_path)
         if is_DFsave:
             mask_indptr, mask_indices, masking_rates = [], [], []
-        if args.json_path is not None:
-            df_json = json_to_df(args.json_path)
+        if json_path is not None:
+            df_json = json_to_df(json_path)
             
         init_image, prediction = None, None
         
         # predict & save
+        print(f"image_names length : {len(image_names)}")
+        print(f"Sample : {image_names[0]}")
+        print(f"type : {type(image_names[0])}")
         for i, img_name in enumerate(image_names):
 
             # loading image & convert dim
@@ -180,10 +189,7 @@ if args.file_type=="image":
             # save the prediction
             
             if i==0:
-                if os.path.exists(args.save_path):
-                    save_path = args.file_type+args.save_path
-                else:
-                    save_path = os.path.join(os.getcwd(), 'image_predictions')
+                if not os.path.exists(save_path):
                     os.mkdir(save_path)
                     print("make image prediction save path !")
 
@@ -199,7 +205,7 @@ if args.file_type=="image":
             save_df["mask_indptr"] = mask_indptr
             save_df["mask_indices"] = mask_indices
             save_df["masking_rate"] = masking_rates
-            if args.json_path is None:
+            if json_path is None:
                 save_df.to_csv(os.path.join(save_path, "masking_result.csv"), index=False, encoding="euc-kr")
             else:
                 save_df["name"] = save_df["image_path"].apply(lambda x: Path(x).stem)
@@ -219,7 +225,7 @@ if args.file_type=="image":
             save_df["mask_indptr"] = mask_indptr
             save_df["mask_indices"] = mask_indices
             save_df["masking_rate"] = masking_rates
-            if args.json_path is None:
+            if json_path is None:
                 save_df.to_csv(os.path.join(save_path, "masking_result.csv"), index=False, encoding="euc-kr")
             else:
                 save_df["name"] = save_df["image_path"].apply(lambda x: Path(x).stem)
@@ -240,10 +246,7 @@ else:
 
             fourcc = cv2.VideoWriter_fourcc(*'DIVX')
             
-            if os.path.exists(args.save_path):
-                save_path = args.file_type+args.save_path
-            else:
-                save_path = os.path.join(os.getcwd(), 'video_predictions')
+            if not os.path.exists(save_path):
                 os.mkdir(save_path)
                 print("make video save path !")
             out = cv2.VideoWriter(os.path.join(save_path, video_name), fourcc, args.frame, (args.crop_width, args.crop_height))
