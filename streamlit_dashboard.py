@@ -7,16 +7,13 @@ import os
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from scipy.sparse import csr_matrix
-# from utils.utils import load_image
-# from bokeh.io import show, output_file
-# from bokeh.plotting import figure
+# from scipy.sparse import csr_matrix   // csr_matrix를 이용할 때 사용
 from pydeck.types import String
+
 
 st.title('Crack Detection Result Dashboard')
 
 RESULT_PATH = "./image_predictions/masking_result.csv"
-DATA_PATH = r"D:\data\dj_data\대전시_도로_영상_객체_인식_데이터셋_2020_위치정보"        # 이건 이미지데이터 로드하려고 했는데 마스킹 결과는 굳이 대시보드에서 안보여주는 걸로
 
 # -- Merge Image
 @st.cache
@@ -46,13 +43,15 @@ def str2list(str_arr):
         return list(map(int, str_arr.lstrip("[").rstrip("]").replace(" ","").split(",")))
     except:
         return []
-@st.cache
-def mat2csrmat(mask_indices, mask_indptr, crop_height=288, crop_width=384):
-    try:
-        test = csr_matrix((np.array([1]*len(mask_indices)), mask_indices, mask_indptr), shape=(crop_height, crop_width)).toarray()
-    except:
-        test = np.array([[0]*crop_width for _ in range(crop_height)])
-    return test
+
+# -- csr matrix를 활용하여 이미지를 불러 올 때 사용 // 현재 코드에서는 사용하지 않음    
+# @st.cache
+# def mat2csrmat(mask_indices, mask_indptr, crop_height=288, crop_width=384):
+#     try:
+#         test = csr_matrix((np.array([1]*len(mask_indices)), mask_indices, mask_indptr), shape=(crop_height, crop_width)).toarray()
+#     except:
+#         test = np.array([[0]*crop_width for _ in range(crop_height)])
+#     return test
 
 data_load_state = st.text('Loading data...')
 use_cols = ["path", "latitude", "longitude", "mask_indices", "mask_indptr", "masking_rate"]
@@ -70,16 +69,14 @@ with c1:
     st.write("VGA : Nvidia RTX 3060 D6 12GB")
     st.write("RAM : Samsung DDR4-25600 32GB(Dual)")
     st.write("Python Version 3.9.13")
-    # if st.checkbox('View Requirement train'):
-    #     st.write(load_data(os.path.join(os.getcwd(), 'requirements.txt'), s="=="))
+    
 with c2:
     st.subheader("Inference")
     st.write("CPU : Intel 12th 12600K")
     st.write("VGA : Nvidia RTX 3070Ti D6x 8GB")
     st.write("RAM : Samsung DDR4-25600 32GB(Dual)")
     st.write("Python Version 3.9.13")
-    # if st.checkbox('View Requirement test'):
-    #     st.write(load_data(os.path.join(os.getcwd(), 'requirements_inference.txt'), s="=="))
+    
 with c3:
     st.subheader('Requirement')
     st.write(load_data(os.path.join(os.getcwd(), 'requirements.txt'), s="=="))
@@ -117,7 +114,7 @@ map_view_data['latitude'] = pd.to_numeric(map_view_data['latitude'])
 map_view_data['longitude'] = pd.to_numeric(map_view_data['longitude'])
 mean_crack_ratio = map_view_data.groupby(by=["latitude", "longitude"], as_index=False)["masking_rate"].mean()
 mean_crack_ratio["stand_mr"] = mean_crack_ratio["masking_rate"]/mean_crack_ratio["masking_rate"].max()
-# st.map(mean_crack_ratio)
+
 center = [127.380, 36.360]
 st.header("Draw Heatmap")
 st.pydeck_chart(pdk.Deck(
@@ -141,10 +138,6 @@ st.pydeck_chart(pdk.Deck(
             get_fill_color='[255, 255-255*masking_rate, 255-255*masking_rate, 255*masking_rate]',
             pickable=True,
             auto_highlight=True,    # 마우스 오버시 출력
-            # get_radius="500*stand_mr"
-            # get_elevation='stand_mr',
-            # elevation_scale=4,
-            # elevation_rate = [0, 1000]
         ),
         pdk.Layer(
             'HeatmapLayer',
@@ -172,7 +165,6 @@ st.pydeck_chart(pdk.Deck(
             map_view_data,
             get_position='[longitude, latitude]',
             pickable=True,
-            # auto_highlight=True,
             extruded=True,
             elevation_scale=3
         )
