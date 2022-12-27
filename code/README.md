@@ -16,8 +16,9 @@
     - [4.4.2 Use Dashboard](#442-use-dashboard)
   - [4.5 Quantized tensorflow lite mod](#45-quantized-tensorflow-lite-mod)
 - [5. 시연 영상](#5-시연-영상)
-  - [5.1 Streamlit Dashboard](#51-streamlit-dashboard)
+  - [5.1 Inference in Terminal](#51-inference-in-terminal)
   - [5.2 Mobile Inference](#52-mobile-inference)
+  - [5.3 Streamlit Dashboard](#53-streamlit-dashboard)
 
 ## 1. 개요
 - AI hub에 구축되어 있는 [도로장애물/표면 인지 영상(수도권)](https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=realm&dataSetSn=179) 데이터 셋을 이용하여 자동으로 도로의 크랙을 탐지할 수 있는 모델을 생성하고, 이를 모바일 환경에서 작동할 수 있도록 경량화한 모델을 개발함
@@ -276,7 +277,10 @@ streamlit run streamlit_dashboard.py --browser.serverAddress localhost
 - 아래의 코드는 `quantization.ipynb` 파일에 정리되어 있으니 자세한 내용은 해당 파일 참조
 
 ## 5. 시연 영상
-### 5.1 Streamlit Dashboard
+### 5.1 Inference in Terminal
+![terminal inference](./assets/inference_demo.gif)
 ### 5.2 Mobile Inference
 ![mobile inference](./assets/road_crack_detection.gif)
+### 5.3 Streamlit Dashboard
+![streamlit dashboard](./assets/streamlit_demo.gif)
 
