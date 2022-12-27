@@ -14,7 +14,10 @@
   - [4.4 Inference](#44-inference)
     - [4.4.1 Image \& Video File Inference](#441-image--video-file-inference)
     - [4.4.2 Use Dashboard](#442-use-dashboard)
-  - [4.5 Quantized tensorflow lite model in Mobile](#45-quantized-tensorflow-lite-model-in-mobile)
+  - [4.5 Quantized tensorflow lite mod](#45-quantized-tensorflow-lite-mod)
+- [5. 시연 영상](#5-시연-영상)
+  - [5.1 Streamlit Dashboard](#51-streamlit-dashboard)
+  - [5.2 Mobile Inference](#52-mobile-inference)
 
 ## 1. 개요
 - AI hub에 구축되어 있는 [도로장애물/표면 인지 영상(수도권)](https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=realm&dataSetSn=179) 데이터 셋을 이용하여 자동으로 도로의 크랙을 탐지할 수 있는 모델을 생성하고, 이를 모바일 환경에서 작동할 수 있도록 경량화한 모델을 개발함
@@ -267,9 +270,13 @@ streamlit run streamlit_dashboard.py --browser.serverAddress localhost
 - [streamlit 공식문서](https://docs.streamlit.io/)를 참조하여 추가적인 기능을 생성할 수 있음
 
 
-### 4.5 Quantized tensorflow lite model in Mobile
+### 4.5 Quantized tensorflow lite mod
 - 학습된 tensorflow model을 모바일에 넣기 위해서 Quantied Tensorflow lite 모델로 변환함
 - 변환된 tflite 모델에 모델의 metadata를 기록해주어야 함(class 정보, normalization 정보 등)
 - 아래의 코드는 `quantization.ipynb` 파일에 정리되어 있으니 자세한 내용은 해당 파일 참조
 
+## 5. 시연 영상
+### 5.1 Streamlit Dashboard
+### 5.2 Mobile Inference
+![mobile inference](./assets/road_crack_detection.gif)
 
