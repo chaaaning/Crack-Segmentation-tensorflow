@@ -13,7 +13,7 @@ from pydeck.types import String
 
 st.title('Crack Detection Result Dashboard')
 
-RESULT_PATH = "./image_predictions/masking_result.csv"
+RESULT_PATH = "../result/image_inferences/masking_result.csv"
 
 # -- Merge Image
 @st.cache
@@ -79,7 +79,7 @@ with c2:
     
 with c3:
     st.subheader('Requirement')
-    st.write(load_data(os.path.join(os.getcwd(), 'requirements.txt'), s="=="))
+    st.write(load_data(os.path.abspath("../requirements.txt"), s="=="))
 
 # -- Split Columns
 col1, col2 = st.columns(2)
