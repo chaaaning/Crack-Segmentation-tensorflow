@@ -1,20 +1,20 @@
 - [1. 개요](#1-개요)
 - [2. Training Environment](#2-training-environment)
 - [3. Model](#3-model)
-    - [3.1. Structure of code and dataset](#31-structure-of-code-and-dataset)
-        - [3.1.1. code ](#311-code)
-        - [3.1.2. dataset](#312-dataset)
-        - [3.1.3. model weights file](#313-model-weights-파일)
-    - [3.2. Parameter](#32-parameter)
-    - [3.3. Model Input/Outplut](#33-모델의-입출력)
-- [4. How to use](#4-how-to-use)
-    - [4.1. Setting Envirionment](#41-환경-세팅)
-    - [4.2. Train](#42-train)
-    - [4.3. Test](#43-test)
-    - [4.4. Inference](#44-inference)
-        - [4.4.1. Image/Video File Inference](#441-image--video-file-inference)
-        - [4.4.2. Use Dashboard](#442-use-dashboard)
-    - [4.5. Quantized tensorflow lite model in Mobile](#45-quantized-tensorflow-lite-model-in-mobile)
+  - [3.1 Structure of code and dataset](#31-structure-of-code-and-dataset)
+    - [3.1.1 Code](#311-code)
+    - [3.1.2 Dataset](#312-dataset)
+    - [3.1.3 Model Weights 파일](#313-model-weights-파일)
+  - [3.2 Parameter](#32-parameter)
+  - [3.3 모델의 입출력](#33-모델의-입출력)
+- [4. How To Use](#4-how-to-use)
+  - [4.1 환경 세팅](#41-환경-세팅)
+  - [4.2 Train](#42-train)
+  - [4.3 Test](#43-test)
+  - [4.4 Inference](#44-inference)
+    - [4.4.1 Image \& Video File Inference](#441-image--video-file-inference)
+    - [4.4.2 Use Dashboard](#442-use-dashboard)
+  - [4.5 Quantized tensorflow lite model in Mobile](#45-quantized-tensorflow-lite-model-in-mobile)
 
 ## 1. 개요
 - AI hub에 구축되어 있는 [도로장애물/표면 인지 영상(수도권)](https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&aihubDataSe=realm&dataSetSn=179) 데이터 셋을 이용하여 자동으로 도로의 크랙을 탐지할 수 있는 모델을 생성하고, 이를 모바일 환경에서 작동할 수 있도록 경량화한 모델을 개발함
@@ -60,6 +60,7 @@
 │   └── inference_data
 │       └──images 
 ├── requirements.txt
+├── environment.yml
 ├── result
 │   ├── pred
 │   ├── true
@@ -137,17 +138,27 @@
 
 ## 4. How To Use
 ### 4.1 환경 세팅
-- 현재 서버에 `tensorflow` 라는 가상환경을 생성한 상태이며 이것을 이용하여 진행해도 무방함.
+- 설치하고자 하는 환경에 anaconda가 깔려있음을 전제로 함
 ```bash
 # 1. 기존의 가상환경 사용
-conda activate tensorflow
+conda activate <가상환경 이름>
 
 # 2. 새로운 가상환경 생성
-#  2-1. 가상환경 생성
+# 2.1 가상환경 생성
 conda create -n <원하는 가상환경 이름> python=3.9
 
-#  2-2 필요한 패키지 설치
+# 두 가지 방법으로 필요한 패키지를 설치할 수 있음
+# 2.1.1 requirements.txt 파일을 이용하여 필요한 패키지 설치
 pip install -r requirements.txt
+
+# 2.1.2 yaml파일을 이용하여 패키지 설치
+#   - environment.yml 파일에서 name(맨위)과 prefix(맨아래)를 본인의 가상환경 이름에 맞게 변경해주세요(어떠한 형식으로 변경하는지는 해당 파일을 참조해주세요)
+
+#    가상환경이 activation 되어 있을 때
+conda env update --file environment.yml
+#    가상환경이 activation 되어 있지 않을 때
+conda env update --name <가상환경이름> --file environment.yml
+
 ```
 
 ### 4.2 Train
